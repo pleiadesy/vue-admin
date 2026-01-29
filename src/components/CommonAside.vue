@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
-
+import { useAsideMenuStore } from '@/stores/AsideMenu'
+import { storeToRefs } from 'pinia'
 // 页面左侧菜单数据
 const list =ref([
       	{
@@ -51,15 +52,23 @@ const list =ref([
 const hasChildren = computed(()=> list.value.filter(item => item.children))
 // 没有孩子的，就是一级菜单
 const noChildren = computed(() => list.value.filter(item => !item.children))
+
+// 点击菜单图标收起/打开侧边栏菜单
+const asideMenuStore = useAsideMenuStore()
+const { isCollapse } = storeToRefs(asideMenuStore)
+// 侧边栏宽度
+const width = computed(()=> isCollapse.value ? "100px" : "180px")
 </script>
 
 <template>
-  <el-aside width="180px">
+  <el-aside :width=width>
     <el-menu
         background-color="#545c64"
         text-color="#fff"
+        :collapse="isCollapse"
       >
-      <h3>通用后台管理系统</h3>
+      <h3 v-show="!isCollapse">通用后台管理系统</h3>
+      <h3 v-show="isCollapse">后台</h3>
       <el-menu-item v-for="item in noChildren" :key="item.path" :index="item.path">
         <component class="icons" :is="item.icon"></component>
         <span>{{item.label}}</span>
@@ -81,6 +90,8 @@ const noChildren = computed(() => list.value.filter(item => !item.children))
 .el-aside {
   height: 100%;
   background-color: #545c64;
+  transition: width 0.3s;
+  overflow: hidden;
 }
 .icons {
   width: 18px;
@@ -94,6 +105,8 @@ const noChildren = computed(() => list.value.filter(item => !item.children))
     line-height: 48px;
     color: #fff;
     text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
   }
 }
 </style>

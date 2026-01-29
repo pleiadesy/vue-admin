@@ -13,7 +13,22 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
 
-app.use(createPinia())
-app.use(router)
+// 异步启动msw
+async function prepareApp() {
+  if(import.meta.env.DEV) { // 只在开发环境下运行
+    const { worker } = await import('./mocks/browser.js')
+    return worker.start({
+      onUnhandledRequest: 'bypass' // 不拦截未定义的请求
+    })
+  }
+  return Promise.resolve()
+}
+prepareApp().then(()=> {
+  app.use(createPinia())
+  app.use(router)
+  app.mount('#app')
+})
 
-app.mount('#app')
+
+
+

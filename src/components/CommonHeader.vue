@@ -1,16 +1,20 @@
 <script setup>
-  // import { ref } from 'vue'
+  import { useAsideMenuStore } from '@/stores/AsideMenu';
   // 动态获取头像图片
   const getAvatorURl = (name) => {
     return new URL(`../assets/images/${name}.png`, import.meta.url).href
   }
+
+  const asideMenuStore = useAsideMenuStore()
+  // 点击菜单图标收起/打开侧边栏
+  const clickMenu = () => asideMenuStore.changeIsCollapse()
 </script>
 
 <template>
   <div class="header">
     <div class="l-content">
       <el-button size="small">
-        <component class="icons" :is="'Menu'"></component>
+        <component class="icons" :is="'Menu'" @click="clickMenu"></component>
       </el-button>
       <el-breadcrumb separator="/" class="breadcrumb">
         <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
