@@ -1,7 +1,9 @@
 <script setup>
 import {ref} from 'vue'
-
-import { getTableDataApi } from '@/api/home'
+import { getTableDataApi, getCountDataApi } from '@/api/home'
+import LineChart from './components/Echarts_Line.vue'
+import BarChart from './components/Echarts_Bar.vue'
+import PieChart from './components/Echarts_pie.vue'
 
 //  动态获取图片地址
 const getAvatorUrl = (name) => {
@@ -19,11 +21,21 @@ getTableData()
 
 // 表单标签
 const tableLabel = ref({
-    name: "课程",
+    name: "品牌",
     todayBuy: "今日购买",
     monthBuy: "本月购买",
     totalBuy: "总购买",
 })
+
+// 卡片内容数据
+const countData = ref([])
+const getCountData = async () => {
+  const res = await getCountDataApi()
+  // console.log(res)
+  countData.value = res.data.data
+}
+getCountData()
+
 </script>
 
 <template>
@@ -43,6 +55,7 @@ const tableLabel = ref({
           <p><span>登录地址:</span><span>云南曲靖</span></p>
         </div>
       </el-card>
+      <!-- 左下方表格数据 -->
       <el-card class="table" shadow="hover">
         <el-table :data="tableData" stripe style="width: 100%">
           <el-table-column prop="name" :label="tableLabel.name" />
@@ -51,6 +64,31 @@ const tableLabel = ref({
           <el-table-column prop="totalBuy" :label="tableLabel.totalBuy" />
         </el-table>
       </el-card>
+    </el-col>
+    <el-col :span="16" margin-top="20px">
+      <!-- 右上方数量卡片 -->
+       <div class="num">
+        <el-card shadow="hover" v-for="item in countData" :key="item.name">
+          <component class="icons" :is="item.icon" :style="{background: item.color }"></component>
+          <div class="detail">
+            <p class="num">{{ item.value }}</p>
+            <p class="text">{{ item.name }}</p>
+          </div>
+        </el-card>
+       </div>
+       <!-- 右下方Echarts图表 -->
+        <el-card class="lineChart">
+          <LineChart></LineChart>
+        </el-card>
+        <!-- 柱状图与饼状图 -->
+         <div class="graph">
+          <el-card>
+            <BarChart></BarChart>
+          </el-card>
+          <el-card>
+            <PieChart></PieChart>
+          </el-card>
+         </div>
     </el-col>
   </el-row>
 
@@ -95,6 +133,52 @@ const tableLabel = ref({
 
   .table {
     margin-top: 20px;
+  }
+
+  .num {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    .el-card {
+      width: 32%;
+      margin-bottom: 20px;
+      background-color: #f7f7f7;
+      border: none;
+      :deep(.el-card__body) {
+        display: flex;
+        align-items: center;
+        padding: 16px 20px;
+      }
+    }
+    .icons {
+      width: 70px;
+      height: 70px;
+      font-size: 30px;
+      text-align: center;
+      line-height: 70px;
+      color: #fff;
+      border-radius: 50%;
+      margin-right: 20px;
+    }
+    .detail {
+        text-align: left;
+        .num {
+          font-size: 26px;
+          margin-bottom: 5px;
+        }
+        .text {
+          font-size: 13px;
+        }
+      }
+  }
+
+  .graph {
+    display: flex;
+    justify-content: space-between;
+    .el-card {
+      width: 48%;
+      height: 260px;
+    }
   }
 }
 </style>
