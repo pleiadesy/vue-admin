@@ -2,6 +2,9 @@
 import { computed, ref } from 'vue'
 import { useAsideMenuStore } from '@/stores/AsideMenu'
 import { storeToRefs } from 'pinia'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 // 页面左侧菜单数据
 const list =ref([
       	{
@@ -71,7 +74,7 @@ const width = computed(()=> isCollapse.value ? "100px" : "180px")
       <h3 v-show="isCollapse">后台</h3>
       <el-menu-item v-for="item in noChildren" :key="item.path" :index="item.path">
         <component class="icons" :is="item.icon"></component>
-        <span>{{item.label}}</span>
+        <span @click="router.push(item.path)">{{item.label}}</span>
       </el-menu-item>
       <el-sub-menu v-for="item in hasChildren" :key="item.path" :index="item.path">
         <template #title>

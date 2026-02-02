@@ -1,7 +1,10 @@
 import {http, HttpResponse} from 'msw'
+import Mock from 'mockjs'
+import { list } from './data'
 
 // 需要拦截的接口
 export const handlers = [
+  // 获取首页表单数据
   http.get('/api/home/getTableData', ()=> {
     return HttpResponse.json({
       code: 200,
@@ -47,6 +50,7 @@ export const handlers = [
       }
     })
   }),
+  // 获取首页每一项数量
   http.get('/api/home/getCountData', ()=> {
     return HttpResponse.json({
       code: 200,
@@ -90,6 +94,7 @@ export const handlers = [
       ]
     })
   }),
+  // 首页echarts图表数据
   http.get('/api/home/getEchartsData', () => {
     return HttpResponse.json({
       code: 200,
@@ -181,6 +186,89 @@ export const handlers = [
           { date: "周日", new: 33, active: 170 },
         ],
       }
+    })
+  }),
+  // 获取用户数据
+  http.get('/api/user/getUserData', ({request}) => {
+    const url = new URL(request.url)
+    const name = url.searchParams.get('name')
+    const page = parseInt(url.searchParams.get('page') || '1')
+    const limit = parseInt(url.searchParams.get('limit') || '10')
+
+    const mockList = list.filter(user => {
+      if(name && user.name.indexOf(name) === -1) return false
+      return true
+    })
+
+    const pageList = mockList.filter((item, index) => {
+      return index < limit * page && index >= limit * (page - 1)
+    })
+
+    return HttpResponse.json({
+      code: 200,
+      data: {
+        list: pageList,
+        count: mockList.length
+      }
+    })
+  }),
+  // 删除用户
+  http.get('/api/user/delete', ({request}) => {
+    const url = new URL(request.url)
+    // 获取要删除的用户的id
+    const id = url.searchParams.get('id')
+
+    if(!id) {
+      return HttpResponse.json({
+        code: 400,
+        message: '参数错误'
+      })
+    } else {
+      const delIndex = list.findIndex(user => user.id === id)
+      if(delIndex !== -1) {
+        list.splice(delIndex, 1)
+      }
+      return HttpResponse.json({
+        code: 200,
+        message: '删除用户成功'
+      })
+    }
+  }),
+
+  // 新增用户
+  http.post('/api/user/addUser', async ({request}) => {
+    const {name, addr, age, birth, gender} = await request.json()
+    list.unshift({
+      id: Mock.Random.guid(),
+      name,
+      addr,
+      age,
+      birth,
+      gender
+    })
+    return HttpResponse.json({
+      code: 200,
+      message: '添加用户成功'
+    })
+  }),
+
+  // 修改用户信息
+  http.post('/api/user/updateUser', async ({request}) => {
+    const {id, name, addr, age, birth, gender} = await request.json()
+    const genderNum = parseInt(gender)
+    list.some(item => {
+      if(item.id == id) {
+        item.name = name
+        item.addr = addr
+        item.age = age
+        item.birth = birth
+        item.gender = genderNum
+        return true
+      }
+    })
+    return HttpResponse.json({
+      code: 200,
+      message: '修改成功'
     })
   })
 ]

@@ -2,8 +2,19 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 import globals from 'globals'
 import js from '@eslint/js'
 import pluginVue from 'eslint-plugin-vue'
+import autoImportGlobals from './.eslintrc-auto-import.json'
+
 
 export default defineConfig([
+  {
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...autoImportGlobals.globals  // ⭐ 加这一行
+      }
+    }
+  },
+
   {
     name: 'app/files-to-lint',
     files: ['**/*.{js,mjs,jsx,vue}'],
