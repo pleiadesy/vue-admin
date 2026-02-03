@@ -1,10 +1,12 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useAsideMenuStore } from '@/stores/AsideMenu'
+import { useTagStore } from '@/stores/tag'
 import { storeToRefs } from 'pinia'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
+const route = useRoute()
 // 页面左侧菜单数据
 const list =ref([
       	{
@@ -15,11 +17,11 @@ const list =ref([
           url: 'Home'
       	},
         {
-            path: '/mall',
-            name: 'mall',
+            path: '/goods',
+            name: 'goods',
             label: '商品管理',
             icon: 'video-play',
-            url: 'Mall'
+            url: 'Goods'
         },
         {
             path: '/user',
@@ -61,6 +63,15 @@ const asideMenuStore = useAsideMenuStore()
 const { isCollapse } = storeToRefs(asideMenuStore)
 // 侧边栏宽度
 const width = computed(()=> isCollapse.value ? "100px" : "180px")
+
+// 切换菜单
+const tagStore = useTagStore()
+const changeMenu = (item) => {
+  // 路由跳转
+  router.push(item.path)
+  // 往tag中添加信息
+  tagStore.checkMenu(item)
+}
 </script>
 
 <template>
@@ -69,14 +80,19 @@ const width = computed(()=> isCollapse.value ? "100px" : "180px")
         background-color="#545c64"
         text-color="#fff"
         :collapse="isCollapse"
+        :default-active="route.path"
       >
       <h3 v-show="!isCollapse">通用后台管理系统</h3>
       <h3 v-show="isCollapse">后台</h3>
-      <el-menu-item v-for="item in noChildren" :key="item.path" :index="item.path">
+      <el-menu-item v-for="item in noChildren" :key="item.path" :index="item.path"
+        @click="changeMenu(item)"
+      >
         <component class="icons" :is="item.icon"></component>
-        <span @click="router.push(item.path)">{{item.label}}</span>
+        <span>{{item.label}}</span>
       </el-menu-item>
-      <el-sub-menu v-for="item in hasChildren" :key="item.path" :index="item.path">
+      <el-sub-menu v-for="item in hasChildren" :key="item.path" :index="item.path"
+        @click="router.push(item.path)"
+      >
         <template #title>
             <el-icon><location /></el-icon>
             <span>{{item.label}}</span>
