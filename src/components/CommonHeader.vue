@@ -1,5 +1,10 @@
 <script setup>
-  import { useAsideMenuStore } from '@/stores/AsideMenu';
+  import { useAsideMenuStore } from '@/stores/AsideMenu'
+  import { useUserStore } from '@/stores/user'
+  import { useRouter } from 'vue-router'
+
+  const userStore = useUserStore()
+  const router = useRouter()
   // 动态获取头像图片
   const getAvatorURl = (name) => {
     return new URL(`../assets/images/${name}.png`, import.meta.url).href
@@ -8,6 +13,28 @@
   const asideMenuStore = useAsideMenuStore()
   // 点击菜单图标收起/打开侧边栏
   const clickMenu = () => asideMenuStore.changeIsCollapse()
+
+  // 退出登录
+  const onLogout = () => {
+    // 退出登录的提示
+    ElMessageBox.confirm(
+    '确定要退出吗？',
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+    .then(() => {
+      ElMessage({
+        type: 'success',
+        message: '已退出登录',
+      })
+      userStore.clearToken()
+      router.push('/login')
+    })
+  }
 </script>
 
 <template>
@@ -28,7 +55,7 @@
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item>个人中心</el-dropdown-item>
-            <el-dropdown-item>退出登录</el-dropdown-item>
+            <el-dropdown-item @click="onLogout">退出登录</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>

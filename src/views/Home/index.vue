@@ -1,9 +1,23 @@
 <script setup>
-import {ref} from 'vue'
+import { ref, onMounted } from 'vue'
 import { getTableDataApi, getCountDataApi } from '@/api/home'
 import LineChart from './components/Echarts_Line.vue'
 import BarChart from './components/Echarts_Bar.vue'
 import PieChart from './components/Echarts_pie.vue'
+import { useUserStore } from '@/stores/user'
+import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
+
+const router= useRouter()
+// 获取token，判断是否已经登录
+const userStore = useUserStore()
+const { token } = storeToRefs(userStore)
+// 未登录，则跳转至登录页
+onMounted(() => {
+  if(!token.value) {
+    router.push('/login')
+  }
+})
 
 //  动态获取图片地址
 const getAvatorUrl = (name) => {

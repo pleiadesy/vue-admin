@@ -270,5 +270,93 @@ export const handlers = [
       code: 200,
       message: '修改成功'
     })
+  }),
+
+  // 登录
+  http.post('/permission/login', async ({request}) => {
+    const { username, password} = await request.json()
+    //  判断用户身份
+    if(username === 'admin' && password === 'admin') {
+      return HttpResponse.json({
+        code: 200,
+        message: '获取成功',
+        data: {
+          menuList: [
+            {
+              path: '/home',
+              name: 'home',
+              label: '首页',
+              icon: 'house',
+              url: 'Home'
+            },
+            {
+              path: '/goods',
+              name: 'goods',
+              label: '商品管理',
+              icon: 'video-play',
+              url: 'Goods'
+            },
+            {
+              path: '/user',
+              name: 'user',
+              label: '用户管理',
+              icon: 'user',
+              url: 'User'
+            },
+            {
+              path: 'other',
+              label: '其他',
+              icon: 'location',
+              children: [
+                {
+                  path: '/page1',
+                  name: 'page1',
+                  label: '页面1',
+                  icon: 'setting',
+                  url: 'Page1'
+                },
+                {
+                  path: '/page2',
+                  name: 'page2',
+                  label: '页面2',
+                  icon: 'setting',
+                  url: 'Page2'
+                }
+              ]
+            }
+          ],
+          token: Mock.Random.guid()
+        }
+      })
+    } else if (username === 'users' && password === 'users') {
+      return HttpResponse.json({
+        code: 200,
+        message: '获取成功',
+        data: {
+          menuList: [
+            {
+              path: '/home',
+              name: 'home',
+              label: '首页',
+              icon: 'house',
+              url: 'Home'
+            },
+            {
+              path: '/user',
+              name: 'user',
+              label: '用户管理',
+              icon: 'user',
+              url: 'User'
+            }
+          ],
+          token: Mock.Random.guid()
+        }
+      })
+    } else {
+      return HttpResponse.json({
+        code: 500,
+        message: '用户名或密码错误'
+      })
+    }
   })
 ]

@@ -26,4 +26,6 @@ export const useTagStore = defineStore('tag', () => {
     checkMenu,
     removeTag
   }
+}, {
+  persist: true
 })
